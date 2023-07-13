@@ -14,6 +14,7 @@ public class InputManager : MonoBehaviour
     // separate vector2 into two floats
     public float movementVerticalInput;
     public float movementHorizontalInput;
+    public float moveAmount = 0f;
 
     // camera input
     Vector2 cameraInput;
@@ -109,7 +110,7 @@ public class InputManager : MonoBehaviour
         // for now no horizontal (strafing) animation, so keep zero
         // only vertical (forward) animation, so clamp and addition
         // values are positive only as we have no moving backwards animation
-        float moveAmount = Mathf.Clamp01(Mathf.Abs(movementHorizontalInput) + Mathf.Abs(movementVerticalInput));
+        moveAmount = Mathf.Clamp01(Mathf.Abs(movementHorizontalInput) + Mathf.Abs(movementVerticalInput));
 
         // if walking input (keyboard only)
         // only works if moveAmount is 1, sets to 0.5

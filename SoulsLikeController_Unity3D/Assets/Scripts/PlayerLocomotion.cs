@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class PlayerLocomotion : MonoBehaviour
@@ -42,6 +43,9 @@ public class PlayerLocomotion : MonoBehaviour
     public bool isJumping = false;
     [SerializeField] private float gravityIntensity = -10f;
     [SerializeField] private float jumpHeight = 1f;
+
+    // stair target y
+    private float targetY;
 
     // calls on creation
     private void Awake()
@@ -144,6 +148,8 @@ public class PlayerLocomotion : MonoBehaviour
     // want to shoot a raycast to see if we are standing on an object
     private void HandleFallingAndLanding()
     {
+        // info on cast
+        RaycastHit hitInfo;
         // where cast starts from (player feet)
         Vector3 rayCastOrigin = transform.position;
         // need height offset to cast just slightly above players feet
@@ -167,8 +173,11 @@ public class PlayerLocomotion : MonoBehaviour
             playerRigidbody.AddForce(-Vector3.up * inAirTimer * fallingSpeed);
         }
 
+        // first set target to current
+        targetY = transform.position.y;
+
         // if cast detects ground beneath us (no longer falling)
-        if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out _, maxDistance, groundLayer)) 
+        if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hitInfo, maxDistance, groundLayer)) 
         {
             // if we are not currently grounded and locked into animation (falling)
             if (!isGrounded && playerManager.isInteracting)
@@ -176,6 +185,9 @@ public class PlayerLocomotion : MonoBehaviour
                 // lock into land animation
                 animatorManager.PlayTargetAnimation("Land", true);
             }
+
+            // get raycast new y
+            targetY = hitInfo.point.y;
 
             // reset timer (have now landed)
             inAirTimer = 0f;
@@ -187,6 +199,19 @@ public class PlayerLocomotion : MonoBehaviour
         {
             // not on ground
             isGrounded = false;
+        }
+
+        // stair check
+        if (isGrounded && !isJumping)
+        {
+            if (playerManager.isInteracting || inputManager.moveAmount > 0f)
+            {
+                transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, targetY, transform.position.z), Time.deltaTime / 0.1f);
+            }
+            else
+            {
+                transform.position = new Vector3(transform.position.x, targetY, transform.position.z);
+            }
         }
     }
 
