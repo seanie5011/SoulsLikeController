@@ -5,7 +5,7 @@ using UnityEngine;
 public class AnimatorManager : MonoBehaviour
 {
     // animator on player
-    Animator animator;
+    public Animator animator;
     // used to id parameters in animator
     int horizontal;
     int vertical;

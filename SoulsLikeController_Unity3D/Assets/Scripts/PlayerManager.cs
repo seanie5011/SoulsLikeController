@@ -47,5 +47,7 @@ public class PlayerManager : MonoBehaviour
 
         // set the players bool to animators bool
         isInteracting = animator.GetBool("isInteracting");
+        playerLocomotion.isJumping = animator.GetBool("isJumping");
+        animator.SetBool("isGrounded", playerLocomotion.isGrounded);
     }
 }

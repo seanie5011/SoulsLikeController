@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public class InputManager : MonoBehaviour
 {
@@ -23,6 +24,10 @@ public class InputManager : MonoBehaviour
     // action input
     public bool sprintingInput = false;
     public bool walkingInput = false;
+    public bool jumpingInput = false;
+
+    // player locomotion
+    PlayerLocomotion playerLocomotion;
 
     // animator
     AnimatorManager animatorManager;
@@ -32,6 +37,8 @@ public class InputManager : MonoBehaviour
     {
         // instantiate animator manager
         animatorManager = GetComponent<AnimatorManager>();
+        // instantiate player locomotion
+        playerLocomotion = GetComponent<PlayerLocomotion>();
     }
 
     // when this script is enabled
@@ -64,6 +71,9 @@ public class InputManager : MonoBehaviour
             // hold to walk
             playerControls.PlayerActions.Walking.performed += (i) => walkingInput = true;
             playerControls.PlayerActions.Walking.canceled += (i) => walkingInput = false;
+
+            // jump input
+            playerControls.PlayerActions.Jump.performed += (i) => jumpingInput = true;
         }
 
         // enable controls
@@ -84,7 +94,8 @@ public class InputManager : MonoBehaviour
         HandleMovementInput();
         // camera input
         HandleCameraInput();
-        // expand by calling other inputs like jump, action, etc
+        // jump input
+        HandleJumpInput();
     }
 
     // assign floats for movement inputs
@@ -116,5 +127,19 @@ public class InputManager : MonoBehaviour
         // assign both horizontal and vertical floats
         cameraHorizontalInput = cameraInput.x;
         cameraVerticalInput = cameraInput.y;
+    }
+
+    // assign 
+    private void HandleJumpInput()
+    {
+        // if we jump
+        if (jumpingInput)
+        { 
+            // cant jump again, set to false
+            jumpingInput = false;
+
+            // call jumping
+            playerLocomotion.HandleJumping();
+        }
     }
 }

@@ -14770,12 +14770,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1177455717382801948, guid: b60a0a8c6d3fe8c42b5691da1ae27c66, type: 3}
+      propertyPath: jumpHeight
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177455717382801948, guid: b60a0a8c6d3fe8c42b5691da1ae27c66, type: 3}
       propertyPath: fallingSpeed
       value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 1177455717382801948, guid: b60a0a8c6d3fe8c42b5691da1ae27c66, type: 3}
       propertyPath: leapingSpeed
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177455717382801948, guid: b60a0a8c6d3fe8c42b5691da1ae27c66, type: 3}
+      propertyPath: gravityIntensity
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 1177455717382801948, guid: b60a0a8c6d3fe8c42b5691da1ae27c66, type: 3}
       propertyPath: groundLayer.m_Bits
