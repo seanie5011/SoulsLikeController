@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -30,13 +31,17 @@ public class PlayerLocomotion : MonoBehaviour
 
     // how long in air for
     private float inAirTimer = 0f;
-    [Header("Falling Parameters")]
-    [SerializeField] private bool isGrounded = true;  // whether on ground (set to what should be at start)
+    [Header("Falling/Jumping Parameters")]
+    public bool isGrounded = true;  // whether on ground (set to what should be at start)
     [SerializeField] private float leapingSpeed = 2f;  // boost off ledge
     [SerializeField] private float fallingSpeed = 1000f;  // fall fast
     [SerializeField] private float maxDistance = 0.5f;  // for raycast
     [SerializeField] private LayerMask groundLayer;  // what can we stand on
     [SerializeField] private float rayCastHeightOffset = 0.5f;  // to set raycast slightly above feet
+
+    public bool isJumping = false;
+    [SerializeField] private float gravityIntensity = -10f;
+    [SerializeField] private float jumpHeight = 1f;
 
     // calls on creation
     private void Awake()
@@ -55,10 +60,10 @@ public class PlayerLocomotion : MonoBehaviour
         // always want to be able to handle these
         HandleFallingAndLanding();
 
-        // call movement and rotation functions
         // if can interact
         if (!playerManager.isInteracting)
         {
+            // moving and rotating
             HandleMovement();
             HandleRotation();
         }
@@ -71,6 +76,7 @@ public class PlayerLocomotion : MonoBehaviour
         moveDirection = cameraObject.forward * inputManager.movementVerticalInput;
         // add the x component (right, so horizontal input (a or d))
         moveDirection = moveDirection + cameraObject.right * inputManager.movementHorizontalInput;
+
         // remove y component
         moveDirection.y = 0;
 
@@ -105,7 +111,7 @@ public class PlayerLocomotion : MonoBehaviour
         }
 
         // assign the movement velocity to rigidbody by multiplying direction by speed
-        playerRigidbody.velocity = moveDirection * movementSpeed;
+        playerRigidbody.velocity = new Vector3(moveDirection.x * movementSpeed, playerRigidbody.velocity.y, moveDirection.z * movementSpeed);
     }
 
     // assigning player rotations
@@ -143,8 +149,8 @@ public class PlayerLocomotion : MonoBehaviour
         // need height offset to cast just slightly above players feet
         rayCastOrigin.y = rayCastOrigin.y + rayCastHeightOffset;
 
-        // if not on the ground
-        if (!isGrounded)
+        // if not on the ground or jumping
+        if (!isGrounded && !isJumping)
         {
             // if not locked in animation
             if (!playerManager.isInteracting)
@@ -181,6 +187,27 @@ public class PlayerLocomotion : MonoBehaviour
         {
             // not on ground
             isGrounded = false;
+        }
+    }
+
+    // if jumping input used
+    public void HandleJumping()
+    {
+        // if we are on the ground
+        if (isGrounded && !isJumping)
+        {
+            // set animation bool and target animations
+            animatorManager.animator.SetBool("isJumping", true);
+            animatorManager.PlayTargetAnimation("Jump", false);
+
+            // get speed based on kinematics equation (v^2 = u^2 + 2*a*s)
+            float jumpingSpeed = Mathf.Sqrt(-2 * gravityIntensity * jumpHeight);
+            // make new vector
+            Vector3 moveVelocity = moveDirection;
+            moveVelocity.y = jumpingSpeed;
+            // set to rigidbody
+            playerRigidbody.velocity = moveVelocity;
+            Debug.Log("yes");
         }
     }
 
